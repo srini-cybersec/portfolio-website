@@ -1,0 +1,160 @@
+name: ATLAS Portfolio Sync
+
+on:
+  schedule:
+    - cron: '0 12 * * 0'  # Weekly: Sunday 12PM UTC
+  workflow_dispatch:
+
+jobs:
+  sync-projects:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AGENT_GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch GitHub projects
+        env:
+          GH_TOKEN: ${{ secrets.AGENT_GITHUB_TOKEN }}
+        run: |
+          gh api graphql -f query='
+          {
+            user(login: "srini-cybersec") {
+              repositories(first: 50, privacy: PUBLIC, orderBy: {field: CREATED_AT, direction: DESC}) {
+                nodes {
+                  name
+                  description
+                  url
+                  createdAt
+                  updatedAt
+                  stargazerCount
+                  forkCount
+                  primaryLanguage { name }
+                  repositoryTopics(first: 10) {
+                    nodes { topic { name } }
+                  }
+                  object(expression: "main:README.md") {
+                    ... on Blob { text }
+                  }
+                }
+              }
+            }
+          }' > repos.json
+
+          echo "Fetched repos:"
+          cat repos.json | python3 -c "import json,sys; d=json.load(sys.stdin); repos=d['data']['user']['repositories']['nodes']; print(f'Total repos: {len(repos)}')"
+
+      - name: Generate projects.json
+        run: |
+          node <<'NODESCRIPT'
+          const fs = require('fs');
+          const data = JSON.parse(fs.readFileSync('repos.json', 'utf8'));
+
+          const CATEGORY_MAP = {
+            'network-security': 'Network Security',
+            'pentest-tools': 'Penetration Testing',
+            'threat-intel': 'Threat Intelligence',
+            'devsecops': 'DevSecOps',
+            'malware-analysis': 'Malware Analysis',
+            'cloud-security': 'Cloud Security',
+            'web-appsec': 'Web Application Security',
+            'cryptography': 'Cryptography',
+            'incident-response': 'Incident Response',
+            'siem-monitoring': 'SIEM & Monitoring',
+            'api-security': 'API Security',
+            'container-security': 'Container Security',
+            'iam-security': 'Identity & Access Management',
+            'zero-trust': 'Zero Trust',
+            'blockchain-security': 'Blockchain Security',
+            'iot-security': 'IoT Security',
+            'purple-team': 'Purple Team',
+            'compliance-tools': 'Compliance',
+            'bug-bounty': 'Bug Bounty',
+            'security-ml': 'Security ML'
+          };
+
+          const projects = data.data.user.repositories.nodes
+            .filter(repo => {
+              const topics = repo.repositoryTopics.nodes.map(t => t.topic.name);
+              return topics.includes('cybersecurity') || topics.includes('security-tools') || topics.includes('infosec');
+            })
+            .map(repo => {
+              const topics = repo.repositoryTopics.nodes.map(t => t.topic.name);
+              const category = topics.find(t => CATEGORY_MAP[t]) || 'cybersecurity';
+
+              return {
+                title: repo.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                slug: repo.name,
+                summary: repo.description || 'Cybersecurity project',
+                category: CATEGORY_MAP[category] || 'Cybersecurity',
+                tags: topics,
+                github_url: repo.url,
+                tech_stack: [repo.primaryLanguage?.name || 'Python'].filter(Boolean),
+                stars: repo.stargazerCount,
+                forks: repo.forkCount,
+                created_at: repo.createdAt,
+                updated_at: repo.updatedAt
+              };
+            });
+
+          fs.mkdirSync('src/data', { recursive: true });
+          fs.writeFileSync('src/data/projects.json', JSON.stringify(projects, null, 2));
+          console.log(`Synced ${projects.length} cybersecurity projects`);
+          projects.forEach(p => console.log(` - ${p.title} (${p.category})`));
+          NODESCRIPT
+
+      - name: Generate portfolio index
+        run: |
+          python3 <<'PYEOF'
+          import json
+          from datetime import datetime, timezone
+
+          with open('src/data/projects.json') as f:
+              projects = json.load(f)
+
+          categories = {}
+          for p in projects:
+              cat = p.get('category', 'Cybersecurity')
+              categories[cat] = categories.get(cat, 0) + 1
+
+          index = {
+              "total_projects": len(projects),
+              "categories": categories,
+              "last_synced": datetime.now(timezone.utc).isoformat(),
+              "github_profile": "https://github.com/srini-cybersec"
+          }
+
+          with open('src/data/index.json', 'w') as f:
+              json.dump(index, f, indent=2)
+
+          print(f"Portfolio index: {len(projects)} projects across {len(categories)} categories")
+          PYEOF
+
+      - name: Commit and push
+        run: |
+          git config user.name "ATLAS Sync Bot"
+          git config user.email "atlas@portfolio.dev"
+          git add src/data/
+          git diff --staged --quiet || git commit -m "chore: sync $(python3 -c \"import json; print(len(json.load(open('src/data/projects.json'))))\") projects from GitHub [$(date '+%Y-%m-%d')]"
+          git push origin main || true
+
+      - name: Sync summary
+        run: |
+          echo "=== ATLAS Sync Complete ==="
+          python3 -c "
+          import json
+          with open('src/data/index.json') as f:
+              idx = json.load(f)
+          print(f\"Total projects: {idx['total_projects']}\")
+          print(f\"Categories: {list(idx['categories'].keys())}\")
+          print(f\"Synced at: {idx['last_synced']}\")
+          "

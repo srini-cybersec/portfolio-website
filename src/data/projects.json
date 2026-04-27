@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "title": "Network Sentinel",
+    "slug": "network-sentinel",
+    "summary": "Real-time network traffic analyzer with ML-based anomaly detection",
+    "category": "Network Security",
+    "tags": [
+      "anomaly-detection",
+      "cybersecurity",
+      "machine-learning",
+      "network-security",
+      "packet-analysis",
+      "python"
+    ],
+    "github_url": "https://github.com/srini-cybersec/network-sentinel",
+    "tech_stack": [
+      "Python"
+    ],
+    "stars": 0,
+    "forks": 0,
+    "created_at": "2026-04-26T22:57:06Z",
+    "updated_at": "2026-04-26T22:57:32Z"
+  }
+]

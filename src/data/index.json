@@ -1,6 +1,8 @@
 {
-  "total_projects": 0,
-  "categories": {},
-  "last_synced": null,
+  "total_projects": 1,
+  "categories": {
+    "Network Security": 1
+  },
+  "last_synced": "2026-04-27T04:19:53.449Z",
   "github_profile": "https://github.com/srini-cybersec"
 }

@@ -5,11 +5,17 @@ on:
     - cron: '0 12 * * 0'  # Weekly: Sunday 12PM UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
-  sync-projects:
+  sync-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -42,119 +48,115 @@ jobs:
                   repositoryTopics(first: 10) {
                     nodes { topic { name } }
                   }
-                  object(expression: "main:README.md") {
-                    ... on Blob { text }
-                  }
                 }
               }
             }
           }' > repos.json
 
-          echo "Fetched repos:"
-          cat repos.json | python3 -c "import json,sys; d=json.load(sys.stdin); repos=d['data']['user']['repositories']['nodes']; print(f'Total repos: {len(repos)}')"
+          TOTAL=$(cat repos.json | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)
+          repos=d['data']['user']['repositories']['nodes']
+          print(len(repos))
+          ")
+          echo "Total public repos: $TOTAL"
 
-      - name: Generate projects.json
+      - name: Generate projects.json and index.json
         run: |
           node <<'NODESCRIPT'
           const fs = require('fs');
           const data = JSON.parse(fs.readFileSync('repos.json', 'utf8'));
 
           const CATEGORY_MAP = {
-            'network-security': 'Network Security',
-            'pentest-tools': 'Penetration Testing',
-            'threat-intel': 'Threat Intelligence',
-            'devsecops': 'DevSecOps',
-            'malware-analysis': 'Malware Analysis',
-            'cloud-security': 'Cloud Security',
-            'web-appsec': 'Web Application Security',
-            'cryptography': 'Cryptography',
-            'incident-response': 'Incident Response',
-            'siem-monitoring': 'SIEM & Monitoring',
-            'api-security': 'API Security',
+            'network-security':   'Network Security',
+            'pentest-tools':      'Penetration Testing',
+            'threat-intel':       'Threat Intelligence',
+            'devsecops':          'DevSecOps',
+            'malware-analysis':   'Malware Analysis',
+            'cloud-security':     'Cloud Security',
+            'web-appsec':         'Web Application Security',
+            'cryptography':       'Cryptography',
+            'incident-response':  'Incident Response',
+            'siem-monitoring':    'SIEM & Monitoring',
+            'api-security':       'API Security',
             'container-security': 'Container Security',
-            'iam-security': 'Identity & Access Management',
-            'zero-trust': 'Zero Trust',
-            'blockchain-security': 'Blockchain Security',
-            'iot-security': 'IoT Security',
-            'purple-team': 'Purple Team',
-            'compliance-tools': 'Compliance',
-            'bug-bounty': 'Bug Bounty',
-            'security-ml': 'Security ML'
+            'iam-security':       'Identity & Access Management',
+            'zero-trust':         'Zero Trust',
+            'blockchain-security':'Blockchain Security',
+            'iot-security':       'IoT Security',
+            'purple-team':        'Purple Team',
+            'compliance-tools':   'Compliance',
+            'bug-bounty':         'Bug Bounty',
+            'security-ml':        'Security ML',
           };
+
+          const SKIP = ['cybersecurity-portfolio-agent','portfolio-website','linkedin-cybersec-agent'];
 
           const projects = data.data.user.repositories.nodes
             .filter(repo => {
+              if (SKIP.includes(repo.name)) return false;
               const topics = repo.repositoryTopics.nodes.map(t => t.topic.name);
-              return topics.includes('cybersecurity') || topics.includes('security-tools') || topics.includes('infosec');
+              return topics.some(t =>
+                ['cybersecurity','security-tools','infosec','ethical-hacking',
+                 'penetration-testing','network-security','cloud-security'].includes(t)
+              );
             })
             .map(repo => {
               const topics = repo.repositoryTopics.nodes.map(t => t.topic.name);
-              const category = topics.find(t => CATEGORY_MAP[t]) || 'cybersecurity';
-
+              const catKey = topics.find(t => CATEGORY_MAP[t]);
               return {
-                title: repo.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-                slug: repo.name,
-                summary: repo.description || 'Cybersecurity project',
-                category: CATEGORY_MAP[category] || 'Cybersecurity',
-                tags: topics,
+                title:      repo.name.split('-').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' '),
+                slug:       repo.name,
+                summary:    repo.description || 'Cybersecurity project',
+                category:   CATEGORY_MAP[catKey] || 'Cybersecurity',
+                tags:       topics,
                 github_url: repo.url,
                 tech_stack: [repo.primaryLanguage?.name || 'Python'].filter(Boolean),
-                stars: repo.stargazerCount,
-                forks: repo.forkCount,
+                stars:      repo.stargazerCount,
+                forks:      repo.forkCount,
                 created_at: repo.createdAt,
-                updated_at: repo.updatedAt
+                updated_at: repo.updatedAt,
               };
             });
 
           fs.mkdirSync('src/data', { recursive: true });
           fs.writeFileSync('src/data/projects.json', JSON.stringify(projects, null, 2));
-          console.log(`Synced ${projects.length} cybersecurity projects`);
-          projects.forEach(p => console.log(` - ${p.title} (${p.category})`));
+
+          const categories = {};
+          projects.forEach(p => { categories[p.category] = (categories[p.category]||0)+1; });
+          const index = {
+            total_projects: projects.length,
+            categories,
+            last_synced: new Date().toISOString(),
+            github_profile: 'https://github.com/srini-cybersec',
+          };
+          fs.writeFileSync('src/data/index.json', JSON.stringify(index, null, 2));
+
+          console.log(`✅ Synced ${projects.length} projects across ${Object.keys(categories).length} categories`);
+          projects.forEach(p => console.log(` · ${p.title} [${p.category}]`));
           NODESCRIPT
 
-      - name: Generate portfolio index
-        run: |
-          python3 <<'PYEOF'
-          import json
-          from datetime import datetime, timezone
-
-          with open('src/data/projects.json') as f:
-              projects = json.load(f)
-
-          categories = {}
-          for p in projects:
-              cat = p.get('category', 'Cybersecurity')
-              categories[cat] = categories.get(cat, 0) + 1
-
-          index = {
-              "total_projects": len(projects),
-              "categories": categories,
-              "last_synced": datetime.now(timezone.utc).isoformat(),
-              "github_profile": "https://github.com/srini-cybersec"
-          }
-
-          with open('src/data/index.json', 'w') as f:
-              json.dump(index, f, indent=2)
-
-          print(f"Portfolio index: {len(projects)} projects across {len(categories)} categories")
-          PYEOF
-
-      - name: Commit and push
+      - name: Commit updated data
         run: |
           git config user.name "ATLAS Sync Bot"
           git config user.email "atlas@portfolio.dev"
           git add src/data/
-          git diff --staged --quiet || git commit -m "chore: sync $(python3 -c \"import json; print(len(json.load(open('src/data/projects.json'))))\") projects from GitHub [$(date '+%Y-%m-%d')]"
+          git diff --staged --quiet || git commit -m "chore: sync $(python3 -c \"import json; print(len(json.load(open('src/data/projects.json'))))\") projects [$(date '+%Y-%m-%d')]"
           git push origin main || true
 
-      - name: Sync summary
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload site to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Print site URL
         run: |
-          echo "=== ATLAS Sync Complete ==="
-          python3 -c "
-          import json
-          with open('src/data/index.json') as f:
-              idx = json.load(f)
-          print(f\"Total projects: {idx['total_projects']}\")
-          print(f\"Categories: {list(idx['categories'].keys())}\")
-          print(f\"Synced at: {idx['last_synced']}\")
-          "
+          echo "🌐 Portfolio live at: ${{ steps.deployment.outputs.page_url }}"
+          echo "Projects synced: $(python3 -c \"import json; print(len(json.load(open('src/data/projects.json'))))\")"

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Srinija Kolapalli | Cybersecurity Professional</title>
+  <meta name="description" content="Cybersecurity portfolio of Srinija Kolapalli — CompTIA Security+ & ISC2 CC certified. SOC Analyst, Security Analyst, Security Engineer.">
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="nav-bracket">[</span>
+      <span class="nav-name">srini-cybersec</span>
+      <span class="nav-bracket">]</span>
+    </div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="about">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-content">
+      <div class="hero-terminal">
+        <div class="terminal-bar">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="terminal-title">~/srinija-kolapalli</span>
+        </div>
+        <div class="terminal-body">
+          <p><span class="prompt">$</span> <span class="cmd">whoami</span></p>
+          <p class="output">Srinija Kolapalli</p>
+          <p><span class="prompt">$</span> <span class="cmd">cat role.txt</span></p>
+          <p class="output">Cybersecurity Professional | SOC Analyst | Security Engineer</p>
+          <p><span class="prompt">$</span> <span class="cmd">ls certs/</span></p>
+          <p class="output cert-line">
+            <span class="cert-badge">CompTIA Security+</span>
+            <span class="cert-badge isc2">ISC2 CC</span>
+          </p>
+          <p><span class="prompt">$</span> <span class="cmd">echo $STATUS</span></p>
+          <p class="output open-to-work">🟢 Open to Work — Cybersecurity Roles in USA</p>
+          <p class="cursor-line"><span class="prompt">$</span> <span class="cursor">▋</span></p>
+        </div>
+      </div>
+
+      <div class="hero-info">
+        <h1>Srinija <span class="accent">Kolapalli</span></h1>
+        <p class="hero-subtitle">Cybersecurity Professional</p>
+        <p class="hero-desc">
+          Passionate about defending digital infrastructure through proactive threat hunting,
+          security automation, and continuous monitoring. Holding CompTIA Security+ and ISC2 CC
+          certifications, seeking impactful roles across the USA.
+        </p>
+        <div class="hero-badges">
+          <span class="badge badge-blue">SOC Analysis</span>
+          <span class="badge badge-green">Threat Intelligence</span>
+          <span class="badge badge-purple">Incident Response</span>
+          <span class="badge badge-orange">Security Automation</span>
+        </div>
+        <div class="hero-cta">
+          <a href="https://www.linkedin.com/in/srinija-kolapalli" target="_blank" class="btn btn-primary">LinkedIn</a>
+          <a href="https://github.com/srini-cybersec" target="_blank" class="btn btn-outline">GitHub</a>
+          <a href="#projects" class="btn btn-ghost">View Projects ↓</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <section class="stats-bar">
+    <div class="stat"><span class="stat-num" id="stat-projects">0</span><span class="stat-label">Projects</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num">2</span><span class="stat-label">Certifications</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num" id="stat-categories">0</span><span class="stat-label">Domains</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num">USA</span><span class="stat-label">Job Target</span></div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="projects-section" id="projects">
+    <div class="section-header">
+      <h2><span class="accent">$</span> ls projects/</h2>
+      <p class="section-sub">Auto-synced from <a href="https://github.com/srini-cybersec" target="_blank">github.com/srini-cybersec</a> weekly</p>
+      <div class="filter-bar" id="filter-bar"></div>
+    </div>
+    <div class="projects-grid" id="projects-grid">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading projects from GitHub...</p>
+      </div>
+    </div>
+    <p class="last-sync" id="last-sync"></p>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="skills-section" id="skills">
+    <div class="section-header">
+      <h2><span class="accent">$</span> cat skills.json</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">🔍</div>
+        <h3>Threat Detection</h3>
+        <ul>
+          <li>SIEM (Splunk, QRadar)</li>
+          <li>Threat Hunting</li>
+          <li>IOC Analysis</li>
+          <li>MITRE ATT&CK</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🛡️</div>
+        <h3>Security Operations</h3>
+        <ul>
+          <li>SOC Workflows</li>
+          <li>Incident Response</li>
+          <li>Vulnerability Management</li>
+          <li>Log Analysis</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">☁️</div>
+        <h3>Cloud Security</h3>
+        <ul>
+          <li>AWS Security</li>
+          <li>Azure Sentinel</li>
+          <li>Cloud Misconfiguration</li>
+          <li>IAM Policies</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">⚙️</div>
+        <h3>Security Automation</h3>
+        <ul>
+          <li>Python Scripting</li>
+          <li>SOAR Workflows</li>
+          <li>DevSecOps CI/CD</li>
+          <li>GitHub Actions</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🌐</div>
+        <h3>Network Security</h3>
+        <ul>
+          <li>Network Monitoring</li>
+          <li>Firewall Rules</li>
+          <li>Packet Analysis</li>
+          <li>Zero Trust</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🔐</div>
+        <h3>Compliance & GRC</h3>
+        <ul>
+          <li>NIST Framework</li>
+          <li>SOC2 / ISO27001</li>
+          <li>Risk Assessment</li>
+          <li>Security Policies</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-section" id="contact">
+    <div class="section-header">
+      <h2><span class="accent">$</span> contact --hire-me</h2>
+      <p class="section-sub">Open to Cybersecurity Analyst, SOC Analyst, and Security Engineer roles across the USA</p>
+    </div>
+    <div class="contact-cards">
+      <a href="https://www.linkedin.com/in/srinija-kolapalli" target="_blank" class="contact-card">
+        <span class="contact-icon">💼</span>
+        <span class="contact-label">LinkedIn</span>
+        <span class="contact-val">srinija-kolapalli</span>
+      </a>
+      <a href="https://github.com/srini-cybersec" target="_blank" class="contact-card">
+        <span class="contact-icon">🐙</span>
+        <span class="contact-label">GitHub</span>
+        <span class="contact-val">srini-cybersec</span>
+      </a>
+      <div class="contact-card">
+        <span class="contact-icon">🎖️</span>
+        <span class="contact-label">Certifications</span>
+        <span class="contact-val">Security+ · ISC2 CC</span>
+      </div>
+      <div class="contact-card">
+        <span class="contact-icon">📍</span>
+        <span class="contact-label">Location</span>
+        <span class="contact-val">USA (Open to Remote)</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Built with ❤️ by Srinija Kolapalli · Projects auto-synced from GitHub via ATLAS agent</p>
+    <p class="footer-sub">CompTIA Security+ · ISC2 CC · <span class="accent">#OpenToWork</span></p>
+  </footer>
+
+  <script src="assets/script.js"></script>
+</body>
+</html>

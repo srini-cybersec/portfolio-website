@@ -141,7 +141,9 @@ jobs:
           git config user.name "ATLAS Sync Bot"
           git config user.email "atlas@portfolio.dev"
           git add src/data/
-          git diff --staged --quiet || git commit -m "chore: sync $(python3 -c \"import json; print(len(json.load(open('src/data/projects.json'))))\") projects [$(date '+%Y-%m-%d')]"
+          COUNT=$(python3 -c 'import json; print(len(json.load(open("src/data/projects.json"))))')
+          TODAY=$(date '+%Y-%m-%d')
+          git diff --staged --quiet || git commit -m "chore: sync ${COUNT} projects [${TODAY}]"
           git push origin main || true
 
       - name: Setup GitHub Pages
@@ -158,5 +160,6 @@ jobs:
 
       - name: Print site URL
         run: |
-          echo "🌐 Portfolio live at: ${{ steps.deployment.outputs.page_url }}"
-          echo "Projects synced: $(python3 -c \"import json; print(len(json.load(open('src/data/projects.json'))))\")"
+          echo "Portfolio live at: ${{ steps.deployment.outputs.page_url }}"
+          COUNT=$(python3 -c 'import json; print(len(json.load(open("src/data/projects.json"))))')
+          echo "Projects synced: ${COUNT}"

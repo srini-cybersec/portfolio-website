@@ -1,5 +1,29 @@
 [
   {
+    "title": "Vaultbreaker",
+    "slug": "vaultbreaker",
+    "summary": "Automated password security auditing tool with HIBP breach correlation, entropy analysis, and policy enforcement",
+    "category": "Cybersecurity",
+    "tags": [
+      "cybersecurity",
+      "ethical-hacking",
+      "hibp",
+      "infosec",
+      "password-security",
+      "penetration-testing",
+      "python",
+      "security-tools"
+    ],
+    "github_url": "https://github.com/srini-cybersec/vaultbreaker",
+    "tech_stack": [
+      "Python"
+    ],
+    "stars": 0,
+    "forks": 0,
+    "created_at": "2026-04-27T08:23:55Z",
+    "updated_at": "2026-04-27T08:24:01Z"
+  },
+  {
     "title": "Network Sentinel",
     "slug": "network-sentinel",
     "summary": "Real-time network traffic analyzer with ML-based anomaly detection",

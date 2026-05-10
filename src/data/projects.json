@@ -1,5 +1,29 @@
 [
   {
+    "title": "Threathunter",
+    "slug": "threathunter",
+    "summary": "OSINT framework for multi-source IOC enrichment and threat intelligence (VirusTotal, AbuseIPDB, Shodan, OTX, URLScan)",
+    "category": "Cybersecurity",
+    "tags": [
+      "cybersecurity",
+      "infosec",
+      "ioc",
+      "osint",
+      "python",
+      "security-tools",
+      "threat-intelligence",
+      "virustotal"
+    ],
+    "github_url": "https://github.com/srini-cybersec/threathunter",
+    "tech_stack": [
+      "Python"
+    ],
+    "stars": 0,
+    "forks": 0,
+    "created_at": "2026-05-04T08:40:02Z",
+    "updated_at": "2026-05-04T08:40:09Z"
+  },
+  {
     "title": "Vaultbreaker",
     "slug": "vaultbreaker",
     "summary": "Automated password security auditing tool with HIBP breach correlation, entropy analysis, and policy enforcement",
